@@ -42,9 +42,9 @@ const texture = textureLoader.load(
 
 let regalo1, regalo2, slitta, albero, renna, olaf, santa
 
-mtlLoader.load('./src/assets/x-mas/ChristmasAssets.mtl', (mat) => {
+mtlLoader.load('./src/assets/x-mas/ChristmasAssets.mtl?url', (mat) => {
 	// loader.setMaterials(mat)
-	loader.load('./src/assets/x-mas/ChristmasAssets.obj', (obj) => {
+	loader.load('./src/assets/x-mas/ChristmasAssets.obj?url', (obj) => {
 		// obj.scale.set(0.1)
 		// scene.add(obj)
 		// obj.scale.setScalar(0.1)
