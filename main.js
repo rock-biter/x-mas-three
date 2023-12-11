@@ -10,6 +10,9 @@ import { Mesh } from 'three'
 import { PlaneGeometry } from 'three'
 import { MeshStandardMaterial } from 'three'
 import { Object3D } from 'three'
+import modelSrc from './src/assets/x-mas/ChristmasAssets.obj?url'
+import textureSrc from './src/assets/x-mas/Texture/Texture_Christmas.png?url'
+import mtlSrc from './src/assets/x-mas/ChristmasAssets.mtl?url'
 
 const noise = createNoise2D()
 
@@ -36,15 +39,13 @@ const loader = new OBJLoader()
 const mtlLoader = new MTLLoader()
 const textureLoader = new THREE.TextureLoader()
 
-const texture = textureLoader.load(
-	'./src/assets/x-mas/Texture/Texture_Christmas.png'
-)
+const texture = textureLoader.load(textureSrc)
 
 let regalo1, regalo2, slitta, albero, renna, olaf, santa
 
-mtlLoader.load('./src/assets/x-mas/ChristmasAssets.mtl?url', (mat) => {
+mtlLoader.load(mtlSrc, (mat) => {
 	// loader.setMaterials(mat)
-	loader.load('./src/assets/x-mas/ChristmasAssets.obj?url', (obj) => {
+	loader.load(modelSrc, (obj) => {
 		// obj.scale.set(0.1)
 		// scene.add(obj)
 		// obj.scale.setScalar(0.1)
