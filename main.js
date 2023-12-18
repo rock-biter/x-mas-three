@@ -1,9 +1,9 @@
 import './style.css'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
-import * as dat from 'lil-gui'
+// import * as dat from 'lil-gui'
 import { OBJLoader } from 'three/addons/loaders/OBJLoader.js'
-import { MTLLoader } from 'three/addons/loaders/MTLLoader.js'
+// import { MTLLoader } from 'three/addons/loaders/MTLLoader.js'
 import Tree from './src/Tree'
 import { createNoise2D } from 'simplex-noise'
 import { Mesh } from 'three'
@@ -12,7 +12,7 @@ import { MeshStandardMaterial } from 'three'
 import { Object3D } from 'three'
 import modelSrc from './src/assets/x-mas/ChristmasAssets.obj?url'
 import textureSrc from './src/assets/x-mas/Texture/Texture_Christmas.png?url'
-import mtlSrc from './src/assets/x-mas/ChristmasAssets.mtl?url'
+// import mtlSrc from './src/assets/x-mas/ChristmasAssets.mtl?url'
 
 const noise = createNoise2D()
 
@@ -29,99 +29,96 @@ const scene = new THREE.Scene()
 /**
  * BOX
  */
-const material = new THREE.MeshNormalMaterial()
-const geometry = new THREE.BoxGeometry(1, 1, 1)
+// const material = new THREE.MeshNormalMaterial()
+// const geometry = new THREE.BoxGeometry(1, 1, 1)
 
 /**
  * X-mas assets
  */
 const loader = new OBJLoader()
-const mtlLoader = new MTLLoader()
+// const mtlLoader = new MTLLoader()
 const textureLoader = new THREE.TextureLoader()
 
 const texture = textureLoader.load(textureSrc)
+texture.colorSpace = THREE.SRGBColorSpace
 
 let regalo1, regalo2, slitta, albero, renna, olaf, santa
 
-mtlLoader.load(mtlSrc, (mat) => {
-	// loader.setMaterials(mat)
-	loader.load(modelSrc, (obj) => {
-		// obj.scale.set(0.1)
-		// scene.add(obj)
-		// obj.scale.setScalar(0.1)
-		// obj.rotation.y = Math.PI
+loader.load(modelSrc, (obj) => {
+	// obj.scale.set(0.1)
+	// scene.add(obj)
+	// obj.scale.setScalar(0.1)
+	// obj.rotation.y = Math.PI
 
-		obj.traverse((o) => {
-			if (o instanceof THREE.Mesh) {
-				o.material.map = texture
-				o.geometry.center()
-				o.scale.setScalar(0.1)
-				o.rotation.y = -Math.PI
-				o.position.set(0, 0, 0)
-				o.castShadow = true
-			}
-		})
-
-		regalo1 = obj.children[0]
-		regalo2 = obj.children[1]
-		slitta = obj.children[2]
-		albero = obj.children[3]
-		renna = obj.children[4]
-		olaf = obj.children[5]
-		santa = obj.children[6]
-
-		santa.position.z = -7
-		santa.position.y = getY(0, -5) + 1.8
-
-		olaf.position.set(-8, getY(-6, -2) + 1.2, -4)
-		olaf.rotation.y = Math.PI * -0.6
-		slitta.quaternion.copy(new THREE.Quaternion().random())
-
-		let x = Math.random() * 4 + 6
-		let z = Math.random() * 4 + 6
-		x *= Math.random() > 0.5 ? 1 : -1
-		z *= Math.random() > 0.5 ? 1 : -1
-
-		slitta.position.set(x, getY(x, z) + 1, z)
-
-		scene.add(santa, olaf, slitta)
-
-		for (let i = 0; i < 40; i++) {
-			let x = Math.random() * 25 + 4
-			let z = Math.random() * 25 + 4
-			x *= Math.random() > 0.5 ? 1 : -1
-			z *= Math.random() > 0.5 ? 1 : -1
-			const pos = new THREE.Vector3(x, getY(x, z), z)
-
-			const r = Math.random() > 0.5 ? regalo1.clone() : regalo2.clone()
-			r.position.copy(pos)
-
-			r.quaternion.copy(new THREE.Quaternion().random())
-
-			scene.add(r)
-		}
-
-		for (let i = 0; i < 6; i++) {
-			let x = Math.random() * 20 + 4
-			let z = Math.random() * 20 + 4
-			x *= Math.random() > 0.5 ? 1 : -1
-			z *= Math.random() > 0.5 ? 1 : -1
-			const pos = new THREE.Vector3(x, getY(x, z), z)
-
-			const r = renna.clone()
-			r.position.copy(pos)
-
-			if (Math.random() > 0.5) {
-				r.quaternion.copy(new THREE.Quaternion().random())
-			} else {
-				r.rotation.y = Math.random() * Math.PI * 2
-				r.position.y += 1
-			}
-
-			scene.add(r)
+	obj.traverse((o) => {
+		if (o instanceof THREE.Mesh) {
+			o.material.map = texture
+			o.geometry.center()
+			o.scale.setScalar(0.1)
+			o.rotation.y = -Math.PI
+			o.position.set(0, 0, 0)
+			o.castShadow = true
 		}
 	})
-	// loader.setMaterials(mat)
+
+	regalo1 = obj.children[0]
+	regalo2 = obj.children[1]
+	slitta = obj.children[2]
+	albero = obj.children[3]
+	renna = obj.children[4]
+	olaf = obj.children[5]
+	santa = obj.children[6]
+
+	santa.position.z = -7
+	santa.position.y = getY(0, -5) + 1.8
+
+	olaf.position.set(-8, getY(-6, -2) + 1.2, -4)
+	olaf.rotation.y = Math.PI * -0.6
+	slitta.quaternion.copy(new THREE.Quaternion().random())
+
+	let x = Math.random() * 4 + 6
+	let z = Math.random() * 4 + 6
+	x *= Math.random() > 0.5 ? 1 : -1
+	z *= Math.random() > 0.5 ? 1 : -1
+
+	slitta.position.set(x, getY(x, z) + 1, z)
+
+	scene.add(santa, olaf, slitta)
+
+	for (let i = 0; i < 40; i++) {
+		let x = Math.random() * 25 + 4
+		let z = Math.random() * 25 + 4
+		x *= Math.random() > 0.5 ? 1 : -1
+		z *= Math.random() > 0.5 ? 1 : -1
+		const pos = new THREE.Vector3(x, getY(x, z), z)
+
+		const r = Math.random() > 0.5 ? regalo1.clone() : regalo2.clone()
+		r.position.copy(pos)
+
+		r.quaternion.copy(new THREE.Quaternion().random())
+
+		scene.add(r)
+	}
+
+	for (let i = 0; i < 6; i++) {
+		let x = Math.random() * 20 + 4
+		let z = Math.random() * 20 + 4
+		x *= Math.random() > 0.5 ? 1 : -1
+		z *= Math.random() > 0.5 ? 1 : -1
+		const pos = new THREE.Vector3(x, getY(x, z), z)
+
+		const r = renna.clone()
+		r.position.copy(pos)
+
+		if (Math.random() > 0.5) {
+			r.quaternion.copy(new THREE.Quaternion().random())
+		} else {
+			r.rotation.y = Math.random() * Math.PI * 2
+			r.position.y += 1
+		}
+
+		scene.add(r)
+	}
 })
 
 const size = 6
