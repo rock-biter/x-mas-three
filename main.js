@@ -173,7 +173,7 @@ for (let i = 0; i < position.count; i++) {
 	const z = position.getZ(i)
 	// const x = position.getX()
 
-	position.setY(i, getY(x, z), 0)
+	position.setY(i, getY(x, z))
 }
 
 position.needsUpdate = true
@@ -186,7 +186,7 @@ scene.background = new THREE.Color(0x222266)
 
 function getY(x, z) {
 	const scalar = noise(x * 0.03, z * 0.03)
-	return scalar * (scalar > 0 ? 3 : 1 - scalar)
+	return scalar * (scalar > 0 ? 3 : 1)
 }
 
 // loader.setMaterials
