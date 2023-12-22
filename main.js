@@ -257,17 +257,19 @@ fontLoader.load(fontSrc, (f) => {
 			const mesh = new Mesh(geom, fontMaterial)
 
 			const angle = Math.PI / 10
-			const x = Math.sin(i * angle) * fontRadius
-			const z = Math.cos(i * angle) * fontRadius
+			const x = Math.sin(i * angle + Math.PI * 0.75) * fontRadius
+			const z = Math.cos(i * angle + Math.PI * 0.75) * fontRadius
 
 			mesh.position.set(x, 3 + getY(x, z), z)
 			mesh.lookAt(0, -2 + Math.random() * 8, 0)
+			mesh.castShadow = true
+			mesh.receiveShadow = true
 
 			return mesh
 		})
 
 	o.add(...chars)
-	o.rotation.y = Math.PI * 0.75
+	// o.rotation.y =
 
 	scene.add(o)
 })
