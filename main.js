@@ -1,7 +1,7 @@
 import './style.css'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
-// import * as dat from 'lil-gui'
+import * as dat from 'lil-gui'
 import { OBJLoader } from 'three/addons/loaders/OBJLoader.js'
 // import { MTLLoader } from 'three/addons/loaders/MTLLoader.js'
 import Tree from './src/Tree'
@@ -26,7 +26,17 @@ const noise = createNoise2D()
 /**
  * Debug
  */
-// const gui = new dat.GUI()
+const gui = new dat.GUI()
+const params = {
+	fogColor: '#080826',
+}
+
+if (gui) {
+	gui.addColor(params, 'fogColor').onChange((val) => {
+		scene.background.set(val)
+		scene.fog.color.set(val)
+	})
+}
 
 /**
  * Scene
@@ -76,16 +86,19 @@ loader.load(modelSrc, (obj) => {
 	olaf = obj.children[5]
 	santa = obj.children[6]
 
+	albero.position.set(-8, getY(-8, -10), -10)
+	albero.geometry.translate(0, 12, 0)
+	scene.add(albero)
+
 	santa.position.z = -5
 	santa.geometry.translate(0, 17.5, 0)
 	santa.position.y = getY(0, -5)
 
 	olaf.geometry.translate(0, 11, 0)
-	olaf.add(new THREE.AxesHelper(30))
-	santa.add(new THREE.AxesHelper(30))
+	// olaf.add(new THREE.AxesHelper(30))
+	// santa.add(new THREE.AxesHelper(30))
 	olaf.position.set(-8, getY(-8, -4), -4)
 	olaf.rotation.y = Math.PI * -0.6
-	slitta.quaternion.copy(new THREE.Quaternion().random())
 
 	let x = Math.random() * 4 + 6
 	let z = Math.random() * 4 + 6
@@ -93,12 +106,13 @@ loader.load(modelSrc, (obj) => {
 	z *= Math.random() > 0.5 ? 1 : -1
 
 	slitta.position.set(x, getY(x, z) + 1, z)
+	slitta.quaternion.copy(new THREE.Quaternion().random())
 
 	scene.add(santa, olaf, slitta)
 
 	for (let i = 0; i < 40; i++) {
-		let x = Math.random() * 25 + 4
-		let z = Math.random() * 25 + 4
+		let x = Math.random() * 14 + 6
+		let z = Math.random() * 14 + 6
 		x *= Math.random() > 0.5 ? 1 : -1
 		z *= Math.random() > 0.5 ? 1 : -1
 		const pos = new THREE.Vector3(x, getY(x, z), z)
@@ -111,9 +125,9 @@ loader.load(modelSrc, (obj) => {
 		scene.add(r)
 	}
 
-	for (let i = 0; i < 6; i++) {
-		let x = Math.random() * 20 + 4
-		let z = Math.random() * 20 + 4
+	for (let i = 0; i < 8; i++) {
+		let x = Math.random() * 14 + 6
+		let z = Math.random() * 14 + 6
 		x *= Math.random() > 0.5 ? 1 : -1
 		z *= Math.random() > 0.5 ? 1 : -1
 		const pos = new THREE.Vector3(x, getY(x, z), z)
@@ -149,12 +163,12 @@ for (let i = 0; i < resolution; i++) {
 
 		if (
 			scalar < limit ||
-			distance > resolution * 0.5 * size ||
+			distance > resolution * 0.4 * size ||
 			distance < resolution * 0.1 * 6
 		)
 			continue
 		const tree = new Tree()
-		tree.mesh.position.set(x, scalar * 1.5, z)
+		tree.mesh.position.set(x, getY(x, z) - 0.5, z)
 		tree.mesh.scale.setScalar(0.8 + Math.max(0.3, scalar + 1))
 		tree.mesh.rotation.y = Math.PI * scalar
 		tree.mesh.position.x += scalar * 2
@@ -176,7 +190,7 @@ normalMap.wrapS = THREE.RepeatWrapping
 normalMap.wrapT = THREE.RepeatWrapping
 
 const ground = new Mesh(
-	new PlaneGeometry(resolution * 6 * 2, resolution * 6 * 2, 400, 400),
+	new PlaneGeometry(resolution * 6 * 2, resolution * 6 * 2, 800, 800),
 	new MeshStandardMaterial({
 		color: 'white',
 		wireframe: false,
@@ -202,15 +216,15 @@ ground.geometry.computeVertexNormals()
 
 scene.add(ground)
 
-scene.fog = new THREE.Fog(0x222266, 60, 110)
-scene.background = new THREE.Color(0x222266)
+scene.fog = new THREE.Fog(params.fogColor, 60, 90)
+scene.background = new THREE.Color(params.fogColor)
 
 function getY(x, z) {
-	let scalar = noise(x * 0.03, z * 0.03)
+	let scalar = noise(x * 0.03, z * 0.03) + 1
 	scalar *= scalar > 0 ? 3 : 3 + 2 * scalar
 	const v = new THREE.Vector2(x, z)
-	if (v.length() < 10) {
-		scalar *= (v.length() / 10) ** 2
+	if (v.length() < 17) {
+		scalar *= (v.length() / 17) ** 2
 	}
 	return scalar
 }
@@ -342,6 +356,27 @@ moonlight.shadow.mapSize.height = 2048
 // moonlight.shadowMap.setMap(1024, 1024)
 
 scene.add(ambLight, dirLight, pointLight, pointLightInner, moonlight)
+
+/**
+ * text lights
+ */
+
+const firstLight = new THREE.PointLight('#33ff00', 10, 15, 1.4)
+firstLight.position.z = 17
+firstLight.position.x = -10
+firstLight.position.y = 12
+
+const secondLight = new THREE.PointLight('#339977', 10, 20, 1.2)
+secondLight.position.z = -11
+secondLight.position.x = 15
+secondLight.position.y = 12
+
+const thirdLight = new THREE.PointLight('#22ff11', 10, 20, 1.1)
+thirdLight.position.z = -17
+thirdLight.position.x = -17
+thirdLight.position.y = 10
+
+scene.add(firstLight, secondLight, thirdLight)
 
 /**
  * renderer
