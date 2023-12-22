@@ -14,7 +14,12 @@ import modelSrc from './src/assets/x-mas/ChristmasAssets.obj?url'
 import textureSrc from './src/assets/x-mas/Texture/Texture_Christmas.png?url'
 import normalSnow from './src/assets/snow-normal.png?url'
 import Fire from './src/Fire'
+import fontSrc from 'three/examples/fonts/droid/droid_sans_bold.typeface.json?url'
+import { FontLoader } from 'three/examples/jsm/loaders/FontLoader'
+import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry'
 // import mtlSrc from './src/assets/x-mas/ChristmasAssets.mtl?url'
+
+const fontLoader = new FontLoader()
 
 const noise = createNoise2D()
 
@@ -209,6 +214,63 @@ function getY(x, z) {
 	}
 	return scalar
 }
+
+/**
+ * Text
+ */
+
+let font, fontMesh
+const fontMaterial = new MeshStandardMaterial({
+	color: '#ffffff',
+	// normalMap: normalMap,
+})
+const fontSize = 7.5
+const fontRadius = 22
+
+fontLoader.load(fontSrc, (f) => {
+	font = f
+
+	const text = 'RESCUE SANTA'
+
+	const o = new Object3D()
+
+	const chars = text
+		.split('')
+		.reverse()
+		.map((char, i) => {
+			if (char === ' ') return new Object3D()
+
+			const geom = new TextGeometry(`${char}`, {
+				font: font,
+				size: fontSize,
+				height: 3,
+				curveSegments: 20,
+				bevelEnabled: true,
+				bevelThickness: 0.1,
+				bevelSize: 0.5,
+				bevelOffset: 0,
+				bevelSegments: 10,
+			})
+			geom.center()
+			// geom.rotateY(Math.PI)
+
+			const mesh = new Mesh(geom, fontMaterial)
+
+			const angle = Math.PI / 10
+			const x = Math.sin(i * angle) * fontRadius
+			const z = Math.cos(i * angle) * fontRadius
+
+			mesh.position.set(x, 3 + getY(x, z), z)
+			mesh.lookAt(0, -2 + Math.random() * 8, 0)
+
+			return mesh
+		})
+
+	o.add(...chars)
+	o.rotation.y = Math.PI * 0.75
+
+	scene.add(o)
+})
 
 // loader.setMaterials
 
