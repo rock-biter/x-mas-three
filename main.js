@@ -12,6 +12,8 @@ import { MeshStandardMaterial } from 'three'
 import { Object3D } from 'three'
 import modelSrc from './src/assets/x-mas/ChristmasAssets.obj?url'
 import textureSrc from './src/assets/x-mas/Texture/Texture_Christmas.png?url'
+import normalSnow from './src/assets/snow-normal.png?url'
+import Fire from './src/Fire'
 // import mtlSrc from './src/assets/x-mas/ChristmasAssets.mtl?url'
 
 const noise = createNoise2D()
@@ -69,10 +71,14 @@ loader.load(modelSrc, (obj) => {
 	olaf = obj.children[5]
 	santa = obj.children[6]
 
-	santa.position.z = -7
-	santa.position.y = getY(0, -5) + 1.8
+	santa.position.z = -5
+	santa.geometry.translate(0, 17.5, 0)
+	santa.position.y = getY(0, -5)
 
-	olaf.position.set(-8, getY(-6, -2) + 1.2, -4)
+	olaf.geometry.translate(0, 11, 0)
+	olaf.add(new THREE.AxesHelper(30))
+	santa.add(new THREE.AxesHelper(30))
+	olaf.position.set(-8, getY(-8, -4), -4)
 	olaf.rotation.y = Math.PI * -0.6
 	slitta.quaternion.copy(new THREE.Quaternion().random())
 
@@ -133,10 +139,13 @@ for (let i = 0; i < resolution; i++) {
 		const scalar = noise(x * 0.03, z * 0.03)
 		const position = new THREE.Vector3(x, scalar, z)
 
+		const distance = position.length()
+		const limit = distance > resolution * 0.3 * 6 ? -0.5 : 0
+
 		if (
-			scalar < -0.5 ||
-			position.length() > resolution * 0.3 * size ||
-			position.length() < resolution * 0.1 * 6
+			scalar < limit ||
+			distance > resolution * 0.5 * size ||
+			distance < resolution * 0.1 * 6
 		)
 			continue
 		const tree = new Tree()
@@ -156,9 +165,19 @@ for (let i = 0; i < resolution; i++) {
 
 scene.add(trees)
 
+const normalMap = textureLoader.load(normalSnow)
+normalMap.repeat.set(50, 50)
+normalMap.wrapS = THREE.RepeatWrapping
+normalMap.wrapT = THREE.RepeatWrapping
+
 const ground = new Mesh(
 	new PlaneGeometry(resolution * 6 * 2, resolution * 6 * 2, 400, 400),
-	new MeshStandardMaterial({ color: 'white', wireframe: false })
+	new MeshStandardMaterial({
+		color: 'white',
+		wireframe: false,
+		normalMap: normalMap,
+		normalScale: new THREE.Vector2(0.08, 0.08),
+	})
 )
 ground.geometry.rotateX(-Math.PI * 0.5)
 ground.receiveShadow = true
@@ -178,12 +197,17 @@ ground.geometry.computeVertexNormals()
 
 scene.add(ground)
 
-scene.fog = new THREE.Fog(0x222266, 60, 90)
+scene.fog = new THREE.Fog(0x222266, 60, 110)
 scene.background = new THREE.Color(0x222266)
 
 function getY(x, z) {
-	const scalar = noise(x * 0.03, z * 0.03)
-	return scalar * (scalar > 0 ? 3 : 1)
+	let scalar = noise(x * 0.03, z * 0.03)
+	scalar *= scalar > 0 ? 3 : 3 + 2 * scalar
+	const v = new THREE.Vector2(x, z)
+	if (v.length() < 10) {
+		scalar *= (v.length() / 10) ** 2
+	}
+	return scalar
 }
 
 // loader.setMaterials
@@ -211,6 +235,10 @@ camera.position.set(20, 15, 20)
  */
 const axesHelper = new THREE.AxesHelper(3)
 // scene.add(axesHelper)
+
+const fire = new Fire()
+fire.mesh.position.y = getY(fire.mesh.position.x, fire.mesh.position.z)
+scene.add(fire.mesh)
 
 const ambLight = new THREE.AmbientLight(0x222266, 0.9)
 const dirLight = new THREE.DirectionalLight(0x333366, 3.5)
@@ -273,6 +301,11 @@ const controls = new OrbitControls(camera, renderer.domElement)
 controls.enableDamping = true
 controls.autoRotate = true
 controls.autoRotateSpeed = 0.2
+controls.enablePan = false
+controls.maxPolarAngle = Math.PI * 0.4
+controls.minPolarAngle = Math.PI * 0.1
+controls.maxDistance = 40
+controls.minDistance = 10
 
 /**
  * Three js Clock
@@ -307,6 +340,13 @@ function tic() {
 	pointLightInner.position.x = noise(time * 2, time) * 0.1
 	pointLight.position.z = noise(time * 2, time * 2) * 0.1
 	pointLightInner.position.z = noise(time * 2, time * 2) * 0.1
+
+	fire.flames.forEach((el, i) => {
+		const offset = i * 10
+		const n = noise(time * 1.5 + offset, time * 1.5 + offset)
+		el.material.opacity = 0.8 + n * 0.2
+		el.scale.setScalar(0.8 - i / 12 + n * 0.2)
+	})
 
 	controls.update()
 
