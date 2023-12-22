@@ -26,15 +26,30 @@ const noise = createNoise2D()
 /**
  * Debug
  */
-const gui = new dat.GUI()
+let gui //= new dat.GUI()
 const params = {
 	fogColor: '#080826',
+	first: '#3dffcf',
+	second: '#47a6ff',
+	third: '#22ff11',
 }
 
 if (gui) {
 	gui.addColor(params, 'fogColor').onChange((val) => {
 		scene.background.set(val)
 		scene.fog.color.set(val)
+	})
+
+	gui.addColor(params, 'first').onChange((val) => {
+		firstLight.color.set(val)
+	})
+
+	gui.addColor(params, 'second').onChange((val) => {
+		secondLight.color.set(val)
+	})
+
+	gui.addColor(params, 'third').onChange((val) => {
+		thirdLight.color.set(val)
 	})
 }
 
@@ -90,6 +105,13 @@ loader.load(modelSrc, (obj) => {
 	albero.geometry.translate(0, 12, 0)
 	scene.add(albero)
 
+	const treeLight = new THREE.PointLight('#ffffff', 15, 15, 1.2)
+	treeLight.position.copy(albero.position)
+	treeLight.position.y += 5
+	treeLight.position.x += 1
+	treeLight.position.z += 1
+	scene.add(treeLight)
+
 	santa.position.z = -5
 	santa.geometry.translate(0, 17.5, 0)
 	santa.position.y = getY(0, -5)
@@ -100,13 +122,17 @@ loader.load(modelSrc, (obj) => {
 	olaf.position.set(-8, getY(-8, -4), -4)
 	olaf.rotation.y = Math.PI * -0.6
 
-	let x = Math.random() * 4 + 6
-	let z = Math.random() * 4 + 6
-	x *= Math.random() > 0.5 ? 1 : -1
-	z *= Math.random() > 0.5 ? 1 : -1
+	// let x = Math.random() * 4 + 6
+	// let z = Math.random() * 4 + 6
+	// x *= Math.random() > 0.5 ? 1 : -1
+	// z *= Math.random() > 0.5 ? 1 : -1
 
-	slitta.position.set(x, getY(x, z) + 1, z)
-	slitta.quaternion.copy(new THREE.Quaternion().random())
+	slitta.position.set(-8, getY(-8, 3) + 1, 3)
+	// slitta.quaternion.copy(new THREE.Quaternion().random())
+	slitta.rotation.x = -Math.PI * 0.4
+	// slitta.rotation.y = -Math.PI * 0.1
+	slitta.rotation.z = Math.PI * -0.25
+	slitta.rotation.order = 'XZY'
 
 	scene.add(santa, olaf, slitta)
 
@@ -163,7 +189,7 @@ for (let i = 0; i < resolution; i++) {
 
 		if (
 			scalar < limit ||
-			distance > resolution * 0.4 * size ||
+			distance > resolution * 0.3 * size ||
 			distance < resolution * 0.1 * 6
 		)
 			continue
@@ -216,7 +242,7 @@ ground.geometry.computeVertexNormals()
 
 scene.add(ground)
 
-scene.fog = new THREE.Fog(params.fogColor, 60, 90)
+scene.fog = new THREE.Fog(params.fogColor, 40, 90)
 scene.background = new THREE.Color(params.fogColor)
 
 function getY(x, z) {
@@ -305,7 +331,7 @@ const sizes = {
  */
 const fov = 60
 const camera = new THREE.PerspectiveCamera(fov, sizes.width / sizes.height, 0.1)
-camera.position.set(20, 15, 20)
+camera.position.set(23, 17, 20)
 // camera.lookAt(new THREE.Vector3(0, 0, 0))
 
 /**
@@ -361,17 +387,17 @@ scene.add(ambLight, dirLight, pointLight, pointLightInner, moonlight)
  * text lights
  */
 
-const firstLight = new THREE.PointLight('#33ff00', 10, 15, 1.4)
+const firstLight = new THREE.PointLight(params.first, 10, 15, 1.4)
 firstLight.position.z = 17
 firstLight.position.x = -10
 firstLight.position.y = 12
 
-const secondLight = new THREE.PointLight('#339977', 10, 20, 1.2)
+const secondLight = new THREE.PointLight(params.second, 10, 20, 1.2)
 secondLight.position.z = -11
 secondLight.position.x = 15
 secondLight.position.y = 12
 
-const thirdLight = new THREE.PointLight('#22ff11', 10, 20, 1.1)
+const thirdLight = new THREE.PointLight(params.third, 10, 20, 1.1)
 thirdLight.position.z = -17
 thirdLight.position.x = -17
 thirdLight.position.y = 10
